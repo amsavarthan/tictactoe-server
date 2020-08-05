@@ -21,6 +21,8 @@ mongoose
     });
 
     io.on("connection", (socket) => {
+      console.log("new connection :", socket.id);
+
       //on creating it emits 'created-room'
       socket.on("create-room", ({ name, roomId }) => {
         socketHandler.createRoom(io, socket, name, roomId);
