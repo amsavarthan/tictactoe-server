@@ -15,6 +15,21 @@ mongoose
     app.get("/", (req, res) => {
       res.send({ message: "I'm alive" });
     });
+
+    // Add headers
+    app.use(function (req, res, next) {
+      // Website you wish to allow to connect
+      res.setHeader("Access-Control-Allow-Origin", "*");
+
+      // Request methods you wish to allow
+      res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+      );
+
+      // Pass to next layer of middleware
+      next();
+    });
   })
   .catch((reason) => {
     console.log(reason);
