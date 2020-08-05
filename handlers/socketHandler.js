@@ -138,6 +138,7 @@ const joinRoom = (io, socket, name, roomId, oldSocketId) => {
 
       document.save().then((updatedDocument) => {
         socket.join(roomId);
+        io.in(roomId).emit("game-status-update", document);
         sendRoomData(io, roomId, updatedDocument);
         socket.emit("joined-room", {
           name,
@@ -148,7 +149,6 @@ const joinRoom = (io, socket, name, roomId, oldSocketId) => {
           severity: "info",
         });
         sendAlert(socket, `You joined the room :)`, "success");
-        io.in(roomId).emit("game-status-update", document);
       });
     })
     .catch((error) => {
@@ -156,29 +156,16 @@ const joinRoom = (io, socket, name, roomId, oldSocketId) => {
     });
 };
 
-const updateGameBoard = (
-  io,
-  socket,
-  roomId,
-  clickedAt,
-  clickedBy,
-  playedBy
-) => {
+const updateGameBoard = (io, socket, roomId, completedCells, playedBy) => {
   socket.to(roomId).broadcast.emit("on-user-selected", {
-    clickedAt,
-    clickedBy,
+    completedCells,
     playedBy,
   });
 
   Room.findOne({ roomId: roomId })
     .then((document) => {
       if (document === null) return;
-      if (
-        document.playedCells.find((cell) => cell.clickedAt === clickedAt) !==
-        undefined
-      )
-        return;
-      document.playedCells.push({ clickedAt, clickedBy });
+      document.playedCells = completedCells;
       document
         .save()
         .then((updatedDocument) =>

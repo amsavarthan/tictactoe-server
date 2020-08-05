@@ -31,19 +31,9 @@ io.on("connection", (socket) => {
     socketHandler.joinRoom(io, socket, name, roomId, oldSocketId);
   });
 
-  socket.on(
-    "on-user-selection",
-    ({ roomId, clickedAt, clickedBy, playedBy }) => {
-      socketHandler.updateGameBoard(
-        io,
-        socket,
-        roomId,
-        clickedAt,
-        clickedBy,
-        playedBy
-      );
-    }
-  );
+  socket.on("on-user-selection", ({ roomId, completedCells, playedBy }) => {
+    socketHandler.updateGameBoard(io, socket, roomId, completedCells, playedBy);
+  });
 
   socket.on("game-restart", (roomId) => {
     socketHandler.restartGame(socket, roomId);
