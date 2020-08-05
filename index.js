@@ -1,9 +1,13 @@
 require("dotenv").config();
 const app = require("express")();
-const http = require("http").createServer(app);
+const http = require("http").Server(app);
 const io = require("socket.io")(http);
 const mongoose = require("mongoose");
 const socketHandler = require("./handlers/socketHandler");
+
+const cors = require("cors");
+app.use(cors());
+app.options("*", cors());
 
 //MongoDB Cloud (Atlas)
 const dbURI = process.env.MONGODB_URI;
@@ -14,21 +18,6 @@ mongoose
   .then(() => {
     app.get("/", (req, res) => {
       res.send({ message: "I'm alive" });
-    });
-
-    // Add headers
-    app.use(function (req, res, next) {
-      // Website you wish to allow to connect
-      res.setHeader("Access-Control-Allow-Origin", "*");
-
-      // Request methods you wish to allow
-      res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-      );
-
-      // Pass to next layer of middleware
-      next();
     });
   })
   .catch((reason) => {
